@@ -53,7 +53,7 @@ public:
   AciditySensor() {}
 
   // Method to perform acidity measurement
-  void measure() {
+  float measure() {
     for (int i = 0; i < 10; i++) {
       buffer[i] = analogRead(ACIDITY_SENSOR);
       delay(30);
@@ -77,8 +77,7 @@ public:
     float voltage = (float)averageValue * 5.0 / 1024 / 6;
     actualValue = -5.70 * voltage + calibrationValue;
 
-    Serial.println("pH Val: ");
-    Serial.print(actualValue);
+    return actualValue;
   }
 };
 
@@ -122,19 +121,24 @@ void setup() {
 // ====================================
 
 void loop() {
-  // Temperature measurement
-  Serial.print("Celsius temperature: ");
-  Serial.print(tempSensor.getTemperatureCelsius());
-  Serial.print(" - Fahrenheit temperature: ");
-  Serial.println(tempSensor.getTemperatureFahrenheit());
+  
+  float acidVal = aciditySensor.measure();
+  float tempCelVal = tempSensor.getTemperatureCelsius();
+  float tempFarVal = tempSensor.getTemperatureFahrenheit();
+  int turbVal = turbiditySensor.measure();
 
   // Acidity measurement
-  aciditySensor.measure();
+  Serial.print("Acid Value: ");
+  Serial.print(acidVal);
 
   // Turbidity measurement
-  int turbidityValue = turbiditySensor.measure();
-  Serial.println("Turbidity Value: ");
-  Serial.println(turbidityValue);
-
-  delay(100);
+  Serial.print(" | Turbidity Value: ");
+  Serial.print(turbVal);
+  
+  // Temperature measurement
+  Serial.print(" | Celsius temperature: ");
+  Serial.print(tempCelVal);
+  Serial.print(" | Fahrenheit temperature: ");
+  Serial.print(tempFarVal);
+  Serial.println("\n==================================================================\n");
 }
