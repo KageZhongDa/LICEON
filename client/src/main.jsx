@@ -1,6 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ChakraProvider, Center, Text, HStack, VStack, Heading, Box } from '@chakra-ui/react';
+import {
+	ChakraProvider,
+	Center,
+	Text,
+	HStack,
+	VStack,
+	Heading,
+	Box,
+	Flex,
+	Spacer,
+} from '@chakra-ui/react';
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react';
 import { Droplet, Filter, Thermometer } from 'react-feather';
 
@@ -18,15 +28,15 @@ import {
 
 function InfoCard({ header, Icon }) {
 	return (
-		<Card flex={1} py={25} px={5}>
+		<Card py={5} px={5} flex={1}>
 			<CardHeader>
 				<Center>
 					<Heading size={'sm'}>{header}</Heading>
 				</Center>
 			</CardHeader>
 			<CardBody>
-				<HStack spacing={4} justifyContent={'space-between'}>
-					<Box>
+				<HStack spacing={4} justifyContent={'space-around'}>
+					<VStack spacing={2} alignItems={'flex-start'}>
 						<Text fontSize={12} fontWeight={'bold'}>
 							Voltage:
 						</Text>
@@ -36,14 +46,14 @@ function InfoCard({ header, Icon }) {
 						<Text fontSize={12} fontWeight={'bold'}>
 							Reading:
 						</Text>
-					</Box>
-					<Box>
-						<Text fontSize={12}>3.45</Text>
+					</VStack>
+					<VStack spacing={2} alignItems={'flex-start'}>
+						<Text fontSize={12}>3.45 V</Text>
 						<Text fontSize={12}>2.54 pH</Text>
 						<Text fontSize={12}>Slightly Cloudy</Text>
-					</Box>
+					</VStack>
 					<Box>
-						<Icon size={70} color={'#82ccdd'} />
+						<Icon size={50} color={'#82ccdd'} />
 					</Box>
 				</HStack>
 			</CardBody>
@@ -53,11 +63,15 @@ function InfoCard({ header, Icon }) {
 
 function InfoSection() {
 	return (
-		<HStack justifyContent={'space-between'}>
+		<Flex
+			justifyContent={{ base: 'center', lg: 'space-around' }}
+			flexDirection={{ base: 'column', lg: 'row' }}>
 			<InfoCard header={'Acidity'} Icon={Droplet} />
+			<Spacer maxW={2} />
 			<InfoCard header={'Turbidity'} Icon={Filter} />
+			<Spacer maxW={2} />
 			<InfoCard header={'Temperature'} Icon={Thermometer} />
-		</HStack>
+		</Flex>
 	);
 }
 
@@ -125,19 +139,22 @@ function TableCard() {
 function App() {
 	return (
 		<Center>
-			<VStack py={30} h={'100vh'} align={'stretch'} spacing={8}>
+			<VStack py={30} h={'100vh'} w={'80%'} align={'stretch'} spacing={8}>
 				<Card>
-					<HStack justifyContent={'space-between'} p={8}>
+					<HStack
+						justifyContent={'space-between'}
+						flexDirection={{ base: 'column', lg: 'row' }}
+						p={8}>
 						<Box>
-							<Text fontSize={14}>
+							<Text fontSize={12}>
 								<b>IP ADDRESS:</b> 192.168.1.13
 							</Text>
-							<Text fontSize={14}>
+							<Text fontSize={12}>
 								<b>SSID:</b> ESP32-NETWORK
 							</Text>
 						</Box>
 						<Box>
-							<Text fontSize={14} fontWeight={'semibold'}>
+							<Text fontSize={12} fontWeight={'semibold'}>
 								Comparison Of Water Quality Between Tap And Rainwater Using Arduino Water
 								Sensor.
 							</Text>
