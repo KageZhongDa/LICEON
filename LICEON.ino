@@ -1,10 +1,29 @@
+// network library
+#include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+#include <ArduinoJson.h>
+
+// temperature sensor library
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+// Define Hotspot credentials
+const char *ssid = "LICEON_ESP32";
+const char *password = "password";
+
+
 // Define pin numbers for sensors
-#define TEMPERATURE_SENSOR 0
-#define TURBIDITY_SENSOR 35
-#define ACIDITY_SENSOR 34
+#define TEMPERATURE_SENSOR 0   // ADC1
+#define TURBIDITY_SENSOR 35    // ADC1
+#define ACIDITY_SENSOR 34      // ADC2
+
+
+// ====================================
+//             WiFi Module
+// ====================================
+
+// Create an instance of the server
+AsyncWebServer server(80);
 
 // ====================================
 //             TemperatureSensor
@@ -44,15 +63,10 @@ TemperatureSensor tempSensor(TEMPERATURE_SENSOR);
 class AciditySensor {
 private:
   float actualValue;
-  float calibrationValue = 20;
   unsigned long int averageValue;
   int buffer[10], temperatureValue;
 
-public:
-  // Constructor
-  AciditySensor() {}
-
-  // Function to map voltage to pH using linear interpolation
+    // Function to map voltage to pH using linear interpolation
   float mapVoltageToPH(float voltage) {
     // Given data points
     float voltagePoints[] = {2.09, 2.25, 3.2};
@@ -72,6 +86,9 @@ public:
     return ph;
   }
 
+public:
+  // Constructor
+  AciditySensor() {}
 
   // Method to perform acidity measurement
   float measure() {
@@ -125,48 +142,66 @@ public:
   // Method to perform turbidity measurement
   int measure() {
     // Read the input on the analog pin
-    return analogRead(sensorPin);
+    return 4095 - analogRead(sensorPin);
   }
 };
 
 // Create an instance of TurbiditySensor
 TurbiditySensor turbiditySensor(TURBIDITY_SENSOR);
-
+ 
 // ====================================
 //               SETUP
 // ====================================
 
 void setup() {
-  Serial.begin(115200);
+  // Start serial communication
+  Serial.begin(9600);
+
+  // ====================================
+  //          WiFi CONNECTION
+  // ====================================
+  // Set up the Access Point
+  WiFi.softAP(ssid, password);
+
+  // Print the Ip Address to the serial on startup
+  Serial.println("Access Point Started");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.softAPIP());
+
+  // ====================================
+  //           API DATA ROUTE
+  // ====================================
+  server.on("/api/data", HTTP_GET, [](AsyncWebServerRequest *request) {
+
+  float acdVal    = aciditySensor.measure();
+  int trbVal      = turbiditySensor.measure(); 
+  float tmpCelVal = tempSensor.getTemperatureCelsius();
+  float tmpFarVal = tempSensor.getTemperatureFahrenheit();
+
+  // Create a JSON object
+  DynamicJsonDocument jsonDoc(1024);
+  
+  // Add data to the JSON object
+  jsonDoc["SERVER"] = "LICEON";
+  jsonDoc["ACDVAL"] = acdVal;
+  jsonDoc["TRBVAL"] = trbVal;
+  jsonDoc["TMPCELVAL"] = tmpCelVal;
+  jsonDoc["TMPFARVAL"] = tmpFarVal;
+
+  // Serialize the JSON object to a string
+  String jsonString;
+  serializeJson(jsonDoc, jsonString);
+
+  // Send the JSON response
+  request->send(200, "application/json", jsonString);
+});
+
+  // Start server
+  server.begin();
 }
 
 // ====================================
 //               LOOP
 // ====================================
 
-void loop() {
-  
-  float acidVal = aciditySensor.measure();
-  float tempCelVal = tempSensor.getTemperatureCelsius();
-  float tempFarVal = tempSensor.getTemperatureFahrenheit();
-
-  // 4095 clear
-  // 0 dense cloud
-  int turbVal = turbiditySensor.measure();
-
-  // Acidity measurement
-  Serial.print("Acid Value: ");
-  Serial.print(acidVal);
-
-  // Turbidity measurement
-  Serial.print(" | Turbidity Value: ");
-  Serial.print(turbVal);
-  
-  // Temperature measurement
-  Serial.print(" | Celsius temperature: ");
-  Serial.print(tempCelVal);
-  Serial.print(" | Fahrenheit temperature: ");
-  Serial.print(tempFarVal);
-  Serial.println("\n==================================================================\n");
-  delay(1000);
-}
+void loop() {}
