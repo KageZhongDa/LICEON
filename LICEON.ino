@@ -7,8 +7,8 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// Define Hotspot credentials
-const char *ssid = "LICEON_ESP32";
+// ::DEFINE THE WIFI CREDENTIALS HERE::
+const char *ssid = "KASERVPOT";
 const char *password = "password";
 
 
@@ -160,13 +160,15 @@ void setup() {
   // ====================================
   //          WiFi CONNECTION
   // ====================================
-  // Set up the Access Point
-  WiFi.softAP(ssid, password);
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+  Serial.println("Connected to WiFi");
+  Serial.println(WiFi.localIP());
 
-  // Print the Ip Address to the serial on startup
-  Serial.println("Access Point Started");
-  Serial.print("IP Address: ");
-  Serial.println(WiFi.softAPIP());
 
   // ====================================
   //           API DATA ROUTE
