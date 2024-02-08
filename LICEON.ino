@@ -101,8 +101,7 @@ public:
     // actualValue = -5.5 * voltage + calibrationValue;
     actualValue = mapVoltageToPH(voltage);
 
-    Serial.println(voltage);
-    return actualValue;
+    return actualValue + 0.4;
   }
 };
 
