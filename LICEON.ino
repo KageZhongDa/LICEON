@@ -2,9 +2,9 @@
 #include <DallasTemperature.h>
 
 // Define pin numbers for sensors
-#define TEMPERATURE_SENSOR A0
-#define TURBIDITY_SENSOR A1
-#define ACIDITY_SENSOR A3
+#define TEMPERATURE_SENSOR 0
+#define TURBIDITY_SENSOR 35
+#define ACIDITY_SENSOR 34
 
 // ====================================
 //             TemperatureSensor
@@ -44,13 +44,34 @@ TemperatureSensor tempSensor(TEMPERATURE_SENSOR);
 class AciditySensor {
 private:
   float actualValue;
-  float calibrationValue = 23.1;
+  float calibrationValue = 20;
   unsigned long int averageValue;
   int buffer[10], temperatureValue;
 
 public:
   // Constructor
   AciditySensor() {}
+
+  // Function to map voltage to pH using linear interpolation
+  float mapVoltageToPH(float voltage) {
+    // Given data points
+    float voltagePoints[] = {2.09, 2.25, 3.2};
+    float phPoints[] = {9, 7, 2};
+
+    // Ensure the voltage is within the range of the data points
+    if (voltage <= voltagePoints[0]) {
+      return phPoints[0];
+    }
+    if (voltage >= voltagePoints[2]) {
+      return phPoints[2];
+    }
+
+    // Perform linear interpolation
+    float ph = phPoints[1] + (voltage - voltagePoints[1]) * (phPoints[2] - phPoints[1]) / (voltagePoints[2] - voltagePoints[1]);
+
+    return ph;
+  }
+
 
   // Method to perform acidity measurement
   float measure() {
@@ -74,9 +95,13 @@ public:
     for (int i = 2; i < 8; i++)
       averageValue += buffer[i];
 
-    float voltage = (float)averageValue * 5.0 / 1024 / 6;
-    actualValue = -5.70 * voltage + calibrationValue;
+    // float voltage = (float)averageValue * 5.0 / 1024 / 6;
+    float voltage = (float)averageValue * 3.3 / 4095 / 6;
+    
+    // actualValue = -5.5 * voltage + calibrationValue;
+    actualValue = mapVoltageToPH(voltage);
 
+    Serial.println(voltage);
     return actualValue;
   }
 };
@@ -125,6 +150,9 @@ void loop() {
   float acidVal = aciditySensor.measure();
   float tempCelVal = tempSensor.getTemperatureCelsius();
   float tempFarVal = tempSensor.getTemperatureFahrenheit();
+
+  // 4095 clear
+  // 0 dense cloud
   int turbVal = turbiditySensor.measure();
 
   // Acidity measurement
@@ -141,4 +169,5 @@ void loop() {
   Serial.print(" | Fahrenheit temperature: ");
   Serial.print(tempFarVal);
   Serial.println("\n==================================================================\n");
+  delay(1000);
 }
