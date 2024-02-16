@@ -52,10 +52,14 @@ SETUP SERVER AND WEBSITE
 the terminal must be on the < LICEON/server/ > directory
 
 START THE SERVER
+
 node listen.js
 
+
 START THE CLIENT
+
 pnpm run dev -- --host
+
 
 GET THE IP ADDRESS THAT STARTS WITH 192.*.*.*
 
