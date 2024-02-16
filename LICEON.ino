@@ -11,12 +11,15 @@
 const char *ssid = "KASERVPOT";
 const char *password = "password";
 
-
 // Define pin numbers for sensors
 #define TEMPERATURE_SENSOR 0   // ADC1
 #define TURBIDITY_SENSOR 35    // ADC1
 #define ACIDITY_SENSOR 34      // ADC2
-
+IPAddress local_IP(192, 168, 192, 168); // Define desired static IP address
+IPAddress gateway(192, 168, 192, 168); // Define gateway IP address
+IPAddress subnet(255, 255, 255, 0); // Define subnet mask
+IPAddress primaryDNS(8, 8, 8, 8); // Define primary DNS server IP address
+IPAddress secondaryDNS(8, 8, 4, 4); // Define secondary DNS server IP address
 
 // ====================================
 //             WiFi Module
@@ -168,8 +171,7 @@ void setup() {
   }
   Serial.println("Connected to WiFi");
   Serial.println(WiFi.localIP());
-
-
+  
   // ====================================
   //           API DATA ROUTE
   // ====================================
