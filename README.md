@@ -2,9 +2,9 @@
 
 DOWNLOAD ARDUINO IDE
 
-
 BOARD MANAGER
 > DOWNLOAD esp32 by Espressif Systems
+> INSTALL PYTHON as dependency for esp32tool.py
 
 LIBRARY MANAGER
 > DOWNLOAD ESPAsyncWebServer by lacamera
@@ -16,38 +16,35 @@ TOP LEFT
 > BOARD: ESP32 Dev Module
 > COM: kun unsay first makita
 
+MODIFY LICEON.ino
+ssid, password, static ip address
+OPTIONAL CHANGES
+change pin 0, 35, 34 to chosen pins, change other ip address settings
 
-THEN CHANGE SSID AND PASSWORD,
-
-CLICK RST ON ESP32 TO SHOW THE IP WHEN IT STARTS WITHOUT RECONNECTING THE USB.
-
-
+UPLOAD TO ESP32
 
 =============================================================================
 
-
-
-
-
 GO TO env.js
 
-CHNAGE THE 
-IP_ESP32_LICEON = '192.168.4.1'; (ip addr ni esp32 from the same wifi nga gi connect niya)
-SSID_ESP32_LICEON = 'LICEON_ESP32'; (ssid sa wifi na gi connect ni esp32)
-
-
+CHANGE 
+IP_ESP32_LICEON = '192.168.192.168'; (192.168.192.168 to static ip)
+SSID_ESP32_LICEON = 'SSID'; (SSID = name of the network)
 
 ====================================================
+
+SETUP MARIADB/MYSQL
+
+======================================================
+SETUP SERVER AND WEBSITE
 
 the terminal must be on the < LICEON/server/ > directory
 
 START THE SERVER
 node listen.js
 
-
 START THE CLIENT
 pnpm run dev -- --host
-
 
 GET THE IP ADDRESS THAT STARTS WITH 192.*.*.*
 
