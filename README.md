@@ -19,8 +19,10 @@ TOP LEFT
 MODIFY LICEON.ino
 ssid, password, static ip address
 
+
 OPTIONAL CHANGES
 change pin 0, 35, 34 to chosen pins, change other ip address settings
+
 
 UPLOAD TO ESP32
 
@@ -37,6 +39,7 @@ SSID_ESP32_LICEON = 'SSID'; (SSID = name of the network)
 SETUP MARIADB/MYSQL
 
 ======================================================
+
 SETUP SERVER AND WEBSITE
 
 the terminal must be on the < LICEON/server/ > directory
