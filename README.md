@@ -18,6 +18,7 @@ TOP LEFT
 
 MODIFY LICEON.ino
 ssid, password, static ip address
+
 OPTIONAL CHANGES
 change pin 0, 35, 34 to chosen pins, change other ip address settings
 
