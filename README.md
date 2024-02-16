@@ -4,7 +4,9 @@ DOWNLOAD ARDUINO IDE
 
 BOARD MANAGER
 > DOWNLOAD esp32 by Espressif Systems
+> 
 > INSTALL PYTHON as dependency for esp32tool.py
+> 
 
 LIBRARY MANAGER
 > DOWNLOAD ESPAsyncWebServer by lacamera
