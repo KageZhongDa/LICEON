@@ -1,44 +1,31 @@
-// network library
+/// Include required libraries for WiFi, AsyncWebServer, ArduinoJson, and sensor components
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <ArduinoJson.h>
-
-// temperature sensor library
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-// ::DEFINE THE WIFI CREDENTIALS HERE::
-const char *ssid = "KASERVPOT";
-const char *password = "password";
+// Define WiFi credentials
+const char *ssid = "KASERVPOT"; // Replace with your WiFi network name
+const char *pass = "password"; // Replace with your WiFi password
+
 
 // Define pin numbers for sensors
-#define TEMPERATURE_SENSOR 0   // ADC1
-#define TURBIDITY_SENSOR 35    // ADC1
-#define ACIDITY_SENSOR 34      // ADC2
-IPAddress local_IP(192, 168, 192, 168); // Define desired static IP address
-IPAddress gateway(192, 168, 192, 168); // Define gateway IP address
-IPAddress subnet(255, 255, 255, 0); // Define subnet mask
-IPAddress primaryDNS(8, 8, 8, 8); // Define primary DNS server IP address
-IPAddress secondaryDNS(8, 8, 4, 4); // Define secondary DNS server IP address
-
-// ====================================
-//             WiFi Module
-// ====================================
+#define TEMPERATURE_SENSOR 0 // Pin connected to the temperature sensor (ADC1)
+#define TURBIDITY_SENSOR 35 // Pin connected to the turbidity sensor (ADC1)
+#define ACIDITY_SENSOR 34 // Pin connected to the acidity sensor (ADC2)
 
 // Create an instance of the server
 AsyncWebServer server(80);
 
-// ====================================
-//             TemperatureSensor
-// ====================================
-
+// Define the TemperatureSensor class
 class TemperatureSensor {
 private:
   OneWire oneWire;
   DallasTemperature temperatureSensor;
 
 public:
-  // Constructor initializes the OneWire and DallasTemperature objects
+  // Constructor initializes OneWire and DallasTemperature objects
   TemperatureSensor(int pin) : oneWire(pin), temperatureSensor(&oneWire) {
     temperatureSensor.begin();
   }
@@ -59,23 +46,20 @@ public:
 // Create an instance of TemperatureSensor
 TemperatureSensor tempSensor(TEMPERATURE_SENSOR);
 
-// ====================================
-//              AciditySensor
-// ====================================
-
+// Define the AciditySensor class
 class AciditySensor {
 private:
   float actualValue;
   unsigned long int averageValue;
   int buffer[10], temperatureValue;
 
-    // Function to map voltage to pH using linear interpolation
+  // Function to map voltage to pH using linear interpolation
   float mapVoltageToPH(float voltage) {
     // Given data points
-    float voltagePoints[] = {2.09, 2.25, 3.2};
-    float phPoints[] = {9, 7, 2};
+    float voltagePoints[] = {2.00, 2.40, 3.10};
+    float phPoints[] = {9.18, 6.86, 4.01};
 
-    // Ensure the voltage is within the range of the data points
+    // Ensure voltage is within range of data points
     if (voltage <= voltagePoints[0]) {
       return phPoints[0];
     }
@@ -85,7 +69,6 @@ private:
 
     // Perform linear interpolation
     float ph = phPoints[1] + (voltage - voltagePoints[1]) * (phPoints[2] - phPoints[1]) / (voltagePoints[2] - voltagePoints[1]);
-
     return ph;
   }
 
@@ -96,8 +79,8 @@ public:
   // Method to perform acidity measurement
   float measure() {
     for (int i = 0; i < 10; i++) {
-      buffer[i] = analogRead(ACIDITY_SENSOR);
-      delay(30);
+      buffer[i] = analogRead(ACIDITY_SENSOR); // Read analog value from acidity sensor
+      delay(30); // Delay for stability
     }
 
     // Sort buffer array in ascending order
@@ -115,23 +98,20 @@ public:
     for (int i = 2; i < 8; i++)
       averageValue += buffer[i];
 
-    // float voltage = (float)averageValue * 5.0 / 1024 / 6;
-    float voltage = (float)averageValue * 3.3 / 4095 / 6;
-    
-    // actualValue = -5.5 * voltage + calibrationValue;
+    // Convert averageValue to voltage
+    float voltage = (float)averageValue * 3.3 / 4095 / 6; // 3.3V reference, 12-bit ADC resolution
+
+    // Map voltage to pH value
     actualValue = mapVoltageToPH(voltage);
 
-    return actualValue + 0.4;
+    return actualValue; // Adjust for calibration or offset
   }
 };
 
 // Create an instance of AciditySensor
 AciditySensor aciditySensor;
 
-// ====================================
-//             TurbiditySensor
-// ====================================
-
+// Define the TurbiditySensor class
 class TurbiditySensor {
 private:
   int sensorPin;
@@ -139,73 +119,64 @@ private:
 public:
   // Constructor
   TurbiditySensor(int pin) : sensorPin(pin) {
-    pinMode(sensorPin, INPUT);
+    pinMode(sensorPin, INPUT); // Set pin mode to INPUT
   }
 
   // Method to perform turbidity measurement
   int measure() {
-    // Read the input on the analog pin
-    return 4095 - analogRead(sensorPin);
+    // Read analog value from turbidity sensor
+
+  return map(analogRead(TURBIDITY_SENSOR), 4095, 0, 0, 1000);
   }
 };
 
 // Create an instance of TurbiditySensor
 TurbiditySensor turbiditySensor(TURBIDITY_SENSOR);
- 
-// ====================================
-//               SETUP
-// ====================================
 
+// Setup function
 void setup() {
   // Start serial communication
-  Serial.begin(9600);
+  Serial.begin(115200);
 
-  // ====================================
-  //          WiFi CONNECTION
-  // ====================================
-  // Connect to Wi-Fi
-  WiFi.begin(ssid, password);
+  // Connect to WiFi network
+  WiFi.begin(ssid, pass);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+    delay(1000); // Wait for connection
     Serial.println("Connecting to WiFi...");
   }
   Serial.println("Connected to WiFi");
-  Serial.println(WiFi.localIP());
-  
-  // ====================================
-  //           API DATA ROUTE
-  // ====================================
+  Serial.println(WiFi.localIP()); // Print local IP address
+
+  // Define route for API data
   server.on("/api/data", HTTP_GET, [](AsyncWebServerRequest *request) {
+    // Measure sensor values
+    float acdVal = aciditySensor.measure();
+    int trbVal = turbiditySensor.measure();
+    float tmpCelVal = tempSensor.getTemperatureCelsius();
+    float tmpFarVal = tempSensor.getTemperatureFahrenheit();
 
-  float acdVal    = aciditySensor.measure();
-  int trbVal      = turbiditySensor.measure(); 
-  float tmpCelVal = tempSensor.getTemperatureCelsius();
-  float tmpFarVal = tempSensor.getTemperatureFahrenheit();
+    // Create JSON object
+    DynamicJsonDocument jsonDoc(1024);
 
-  // Create a JSON object
-  DynamicJsonDocument jsonDoc(1024);
-  
-  // Add data to the JSON object
-  jsonDoc["SERVER"] = "LICEON";
-  jsonDoc["ACDVAL"] = acdVal;
-  jsonDoc["TRBVAL"] = trbVal;
-  jsonDoc["TMPCELVAL"] = tmpCelVal;
-  jsonDoc["TMPFARVAL"] = tmpFarVal;
+    // Add data to JSON object
+    jsonDoc["SERVER"] = "LICEON";
+    jsonDoc["ACDVAL"] = acdVal;
+    jsonDoc["TRBVAL"] = trbVal;
+    jsonDoc["TMPCELVAL"] = tmpCelVal;
+    jsonDoc["TMPFARVAL"] = tmpFarVal;
 
-  // Serialize the JSON object to a string
-  String jsonString;
-  serializeJson(jsonDoc, jsonString);
+    // Serialize JSON object to string
+    String jsonString;
+    serializeJson(jsonDoc, jsonString);
 
-  // Send the JSON response
-  request->send(200, "application/json", jsonString);
-});
+    // Send JSON response
+    request->send(200, "application/json", jsonString);
+  });
 
   // Start server
   server.begin();
 }
 
-// ====================================
-//               LOOP
-// ====================================
-
+// Loop function
 void loop() {}
+  
