@@ -25,7 +25,7 @@ TOP LEFT
 > 
 
 MODIFY LICEON.ino
-> ssid, password, static ip address
+> ssid, password
 
 
 
@@ -41,7 +41,7 @@ UPLOAD TO ESP32
 GO TO env.js
 
 CHANGE 
->IP_ESP32_LICEON = '192.168.192.168'; (192.168.192.168 to static ip)
+>IP_ESP32_LICEON = '192.168.192.168'; (192.168.192.168 to ip declared in Arduino IDE)
 >
 >SSID_ESP32_LICEON = 'SSID'; (SSID = name of the network)
 

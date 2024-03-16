@@ -88,17 +88,17 @@ function InfoSection({ data }) {
 				setAcdRead('Baking Soda');
 			}
 
-			if (data[0].trbval >= 4000) {
+			if (data[0].trbval >= 1000) {
 				setTrbRead('Densely Cloudy');
-			} else if (data[0].trbval >= 3000) {
-				setTrbRead('Cloudy');
-			} else if (data[0].trbval >= 2000) {
-				setTrbRead('Slightly Cloudy');
-			} else if (data[0].trbval >= 1000) {
-				setTrbRead('Blurry');
 			} else if (data[0].trbval >= 500) {
+				setTrbRead('Cloudy');
+			} else if (data[0].trbval >= 200) {
 				setTrbRead('Slightly Cloudy');
-			} else if (data[0].trbval >= 300) {
+			} else if (data[0].trbval >= 100) {
+				setTrbRead('Blurry');
+			} else if (data[0].trbval >= 50) {
+				setTrbRead('Slightly Cloudy');
+			} else if (data[0].trbval >= 20) {
 				setTrbRead('Clear');
 			} else if (data[0].trbval >= 0) {
 				setTrbRead('Crystal Clear');
