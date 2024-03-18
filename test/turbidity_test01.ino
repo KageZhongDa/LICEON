@@ -14,7 +14,7 @@ float ntu;
 
 float temp_data = 25.0;
 
-float TU_value = 0.0;
+//float TU_value = 0.0;
 float TU_calibration = 0.0;
 
 void setup() {

@@ -10,15 +10,7 @@ const char *ssid = "KASERVPOT"; // Replace with your WiFi network name
 const char *pass = "password"; // Replace with your WiFi password
 
 float trbvolt;
-float ntu;
 float ntuFinal;
-float temp_data = 25.0;
-float TU_value = 0.0;
-float TU_calibration = 0.0;
-
-void setup(){
-  wifi();
-}
 
 // Define pin numbers for sensors
 #define TEMPERATURE_SENSOR 0 // Pin connected to the temperature sensor (ADC1)
@@ -66,7 +58,7 @@ private:
   // Function to map voltage to pH using linear interpolation
   float mapVoltageToPH(float voltage) {
     // Given data points
-    float voltagePoints[] = {2.00, 2.40, 3.10};
+    float voltagePoints[] = {2.10, 2.47, 3.10};
     float phPoints[] = {9.18, 6.86, 4.01};
 
     // Ensure voltage is within range of data points
@@ -121,28 +113,6 @@ public:
 // Create an instance of AciditySensor
 AciditySensor aciditySensor;
 
-// Loop function
-void loop() {
-  loop1();
-}
-void loop1(){
-  // Send the command to get temperatures
-  trbvolt = 0;
-  //Calculate Average Voltage Values
-  for(int i=0; i<800; i++) {
-    trbvolt += ((float)analogRead(TURBIDITY_SENSOR)/4095)*3.3;
-  }
-  trbvolt = trbvolt/725;
-  float TU_calibration = -0.0192 * (tempSensor.getTemperatureCelsius() - 25);
-  float standardVolt = trbvolt - TU_calibration;
-  double number = standardVolt;
-  double squared = pow(number,2);
-  float ntu = ((-1120.4*squared+5742.3*standardVolt-4353.8)/3); 
-  float ntuFinal = 1000 - ntu;
-
-  if (ntuFinal <= 0) { ntuFinal = 0; };
-  if (ntuFinal >= 1000) { ntuFinal = 1000; };
-}
 // Define the TurbiditySensor class
 class TurbiditySensor {
 private:
@@ -156,6 +126,21 @@ public:
 
   // Method to perform turbidity measurement
   int measure() {
+    trbvolt = 0;
+    for(int i=0; i<800; i++) {
+    trbvolt += ((float)analogRead(TURBIDITY_SENSOR)/4095)*3.3;
+    }
+    trbvolt = trbvolt/725;
+    float tempC = tempSensor.getTemperatureCelsius();
+    float TU_calibration = -0.0192 * (tempC - 25);
+    float standardVolt = trbvolt - TU_calibration;
+    double number = standardVolt;
+    double squared = pow(number,2);
+    float ntu = ((-1120.4*squared+5742.3*standardVolt-4353.8)/3); 
+    float ntuFinal = 1000 - ntu;
+
+  if (ntuFinal <= 0) { ntuFinal = 0; };
+  if (ntuFinal >= 1000) { ntuFinal = 1000; };
     // Read analog value from turbidity sensor
   return ntuFinal;
   }
@@ -163,6 +148,9 @@ public:
 
 // Create an instance of TurbiditySensor
 TurbiditySensor turbiditySensor(TURBIDITY_SENSOR);
+void setup(){
+  wifi();
+}
 // Setup function
 void wifi() {
   // Start serial communication
@@ -206,5 +194,10 @@ void wifi() {
   // Start server
   server.begin();
 }
-
-  
+// Loop function
+void loop() {}
+//void loop2(){
+  //Serial.println(aciditySensor.measure());
+  //Serial.println(turbiditySensor.measure());
+  //Serial.println(tempSensor.getTemperatureCelsius());
+//}

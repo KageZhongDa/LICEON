@@ -71,21 +71,31 @@ function InfoSection({ data }) {
 			setLatestData(data[0]);
 
 			if (data[0].acdval <= 2) {
-				setAcdRead('Vinegar');
+				setAcdRead('Very Acidic');
 			} else if (data[0].acdval <= 3) {
-				setAcdRead('Coke');
+				setAcdRead('Moderately Acidic');
 			} else if (data[0].acdval <= 4) {
-				setAcdRead('Acid Rain');
+				setAcdRead('Moderately Acidic');
 			} else if (data[0].acdval <= 5) {
-				setAcdRead('Banana');
+				setAcdRead('Slightly Acidic');
 			} else if (data[0].acdval <= 6) {
-				setAcdRead('Milk');
+				setAcdRead('Slightly Acidic');
 			} else if (data[0].acdval <= 7) {
-				setAcdRead('Tap Water');
+				setAcdRead('Neutral');
 			} else if (data[0].acdval <= 8) {
-				setAcdRead('Sea Water');
+				setAcdRead('Neutral');
 			} else if (data[0].acdval <= 9) {
-				setAcdRead('Baking Soda');
+				setAcdRead('Slightly Alkaline');
+			} else if (data[0].acdval <= 10) {
+				setAcdRead('Moderately Alkaline');
+			} else if (data[0].acdval <= 11) {
+                                setAcdRead('Moderately Alkaline');
+			} else if (data[0].acdval <= 12) {
+                                setAcdRead('Very Alkaline');
+			} else if (data[0].acdval < 13) {
+                                setAcdRead('Very Alkaline');
+			} else if (data[0].acdval >= 13) {
+                                setAcdRead('Very Alkaline');
 			}
 
 			if (data[0].trbval >= 1000) {
@@ -97,7 +107,7 @@ function InfoSection({ data }) {
 			} else if (data[0].trbval >= 100) {
 				setTrbRead('Blurry');
 			} else if (data[0].trbval >= 50) {
-				setTrbRead('Slightly Cloudy');
+				setTrbRead('Slightly Blurry');
 			} else if (data[0].trbval >= 20) {
 				setTrbRead('Clear');
 			} else if (data[0].trbval >= 0) {
@@ -105,7 +115,7 @@ function InfoSection({ data }) {
 			}
 
 			if (data[0].tmpcelval >= 100) {
-				setTmpRead('Impyerno');
+				setTmpRead('Above Boiling');
 			} else if (data[0].tmpcelval >= 70) {
 				setTmpRead('Extremely Hot');
 			} else if (data[0].tmpcelval >= 50) {
@@ -119,7 +129,7 @@ function InfoSection({ data }) {
 			} else if (data[0].tmpcelval >= 18) {
 				setTmpRead('Very Cold');
 			} else if (data[0].tmpcelval >= 12) {
-				setTmpRead('Polar Bear');
+				setTmpRead('Ice Cold');
 			}
 		}
 	}, [data]);
