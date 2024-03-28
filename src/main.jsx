@@ -129,7 +129,7 @@ function InfoSection({ data }) {
 			} else if (data[0].tmpcelval >= 18) {
 				setTmpRead('Very Cold');
 			} else if (data[0].tmpcelval >= 12) {
-				setTmpRead('Ice Cold');
+				setTmpRead('Ice Cold');     
 			}
 		}
 	}, [data]);

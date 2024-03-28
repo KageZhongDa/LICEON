@@ -9,8 +9,9 @@
 const char *ssid = "KASERVPOT"; // Replace with your WiFi network name
 const char *pass = "password"; // Replace with your WiFi password
 
-float trbvolt;
-float ntuFinal;
+void setup(){
+  wifi();
+}
 
 // Define pin numbers for sensors
 #define TEMPERATURE_SENSOR 0 // Pin connected to the temperature sensor (ADC1)
@@ -113,10 +114,15 @@ public:
 // Create an instance of AciditySensor
 AciditySensor aciditySensor;
 
+// Loop function
+void loop() {}
+
 // Define the TurbiditySensor class
 class TurbiditySensor {
 private:
   int sensorPin;
+  float trbvolt;
+  float ntuFinal;
 
 public:
   // Constructor
@@ -148,9 +154,6 @@ public:
 
 // Create an instance of TurbiditySensor
 TurbiditySensor turbiditySensor(TURBIDITY_SENSOR);
-void setup(){
-  wifi();
-}
 // Setup function
 void wifi() {
   // Start serial communication
@@ -194,8 +197,6 @@ void wifi() {
   // Start server
   server.begin();
 }
-// Loop function
-void loop() {}
 //void loop2(){
   //Serial.println(aciditySensor.measure());
   //Serial.println(turbiditySensor.measure());
